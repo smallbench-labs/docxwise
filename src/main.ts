@@ -1,7 +1,6 @@
-import { AbstractInputSuggest, App, FuzzySuggestModal, Menu, Notice, Platform, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder, normalizePath, parseYaml } from 'obsidian';
+import { AbstractInputSuggest, App, FuzzySuggestModal, Menu, Notice, Platform, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder, normalizePath } from 'obsidian';
 import { Converter, ExportOptions } from './core/convert';
 import { parseBibtex, CslItem } from './core/bibtex';
-import { preprocess } from './core/markdown';
 import { ObsidianHost } from './obsidianHost';
 import { STYLES, LOCALE_EN_US } from './styles';
 import { LicenseManager, DEFAULT_LICENSE_CONFIG } from './license/licenseManager';
@@ -216,7 +215,7 @@ export default class DocxwisePlugin extends Plugin {
 	async loadSettings() {
 		const raw = ((await this.loadData()) ?? {}) as Partial<Settings>;
 		this.settings = { ...DEFAULTS, ...raw, license: { ...EMPTY_LICENSE, ...(raw.license ?? {}) } };
-		this.keyStore = selectKeyStore(this.app as unknown as Parameters<typeof selectKeyStore>[0]);
+		this.keyStore = selectKeyStore(this.app);
 		this.settings.license.key = this.keyStore.load(this.settings.license.key);
 	}
 	async saveSettings() {
@@ -228,10 +227,9 @@ export default class DocxwisePlugin extends Plugin {
 class UserError extends Error {}
 
 function titleFor(app: App, f: TFile): string {
-	const t = app.metadataCache.getFileCache(f)?.frontmatter?.title;
+	const t: unknown = app.metadataCache.getFileCache(f)?.frontmatter?.title;
 	return typeof t === 'string' && t.trim() ? t.trim() : f.basename;
 }
-void preprocess; void parseYaml;
 
 /** Vault path suggestions under a settings text field (folders, or files with given extensions). */
 class PathSuggest extends AbstractInputSuggest<TAbstractFile> {
@@ -239,7 +237,7 @@ class PathSuggest extends AbstractInputSuggest<TAbstractFile> {
 	getSuggestions(q: string): TAbstractFile[] {
 		const query = q.toLowerCase();
 		return this.app.vault.getAllLoadedFiles()
-			.filter((f) => (this.kind === 'folder' ? f instanceof TFolder && f.path !== '/' : f instanceof TFile && (this.kind as RegExp).test(f.name)))
+			.filter((f) => (this.kind === 'folder' ? f instanceof TFolder && f.path !== '/' : f instanceof TFile && (this.kind).test(f.name)))
 			.filter((f) => f.path.toLowerCase().includes(query))
 			.sort((a, b) => a.path.localeCompare(b.path))
 			.slice(0, 50);

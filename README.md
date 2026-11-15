@@ -4,6 +4,12 @@
 
 Export Obsidian notes to clean, editable Word (`.docx`) files. No Pandoc, no extra installs; works on desktop and mobile.
 
+![Exporting a note: the notice shows where the .docx was saved](docs/export-notice.png)
+
+![A page of an exported .docx with equations, citations, callouts and a footnote](docs/sample-output.png)
+
+*Exported page rendered with LibreOffice for this screenshot. Equations are native Word equations; Word's own rendering can differ slightly.*
+
 ## Features
 
 - Headings, bold, italic, strikethrough, ==highlights==, inline code, links
@@ -37,6 +43,8 @@ Click the **Export current note to .docx** icon in the left ribbon, run the comm
 - On iPhone and iPad the file is in your vault folder: open the Files app → On My iPhone/iPad → Obsidian → your vault (or iCloud Drive → Obsidian). On Android it is in the vault folder you chose when creating the vault. From there you can open it in Word or share it.
 - If something could not be exported exactly (a missing image, an unknown citation key, a DataviewJS block), the file is still saved and the notice lists what to check.
 
+![Docxwise settings](docs/settings.png)
+
 Per-note overrides in properties: `bibliography: refs/other.bib`, `csl: refs/nature.csl`, `reference-section-title: Sources`.
 
 ## Payment disclosure
@@ -53,7 +61,7 @@ Per-note overrides in properties: `bibliography: refs/other.bib`, `csl: refs/nat
 
 - **Exporting never sends your notes anywhere.** Conversion runs entirely on your device.
 - **Web images:** if a note links an image by `https://` URL, that image is downloaded from its server when you export the note (the same request your browser would make; that server sees your IP address). Local images make no requests.
-- **Region check:** when you open Settings → Docxwise without an active Pro key, Docxwise sends one `GET https://formchime.com/api/region` request to check whether Pro can be sold in your region (nothing else is sent). This request sends your IP address to formchime.com, which reads only the country Cloudflare derives from it. formchime.com does not store your IP; Cloudflare's request logs may include it for up to 7 days. If the answer is "blocked", the Buy Pro button is hidden. If the request fails, times out (10 seconds) or returns an unexpected answer, the Buy Pro button is also hidden and the panel says "Couldn't check your region. Reopen settings later to try again."
+- **Region check:** when you open Settings → Docxwise without an active Pro key, Docxwise sends one `GET https://formchime.com/api/region` request to check whether Pro can be sold in your region (nothing else is sent). This request sends your IP address to formchime.com, which reads only the country Cloudflare derives from it. formchime.com does not store your IP or country, and logging for its Worker is turned off; Cloudflare, which runs formchime.com, may keep short-term operational logs under its own policy. If the answer is "blocked", the Buy Pro button is hidden. If the request fails, times out (10 seconds) or returns an unexpected answer, the Buy Pro button is also hidden and the panel says "Couldn't check your region. Reopen settings later to try again."
 - **Checkout:** when you press Buy Pro, formchime.com passes your IP to Polar to create the checkout (tax and fraud checks) and records your two-letter country code and the product name in that checkout's metadata; formchime.com itself does not keep them.
 - **License:** with a key, when you press **Activate** or **Remove**, then at most **once a day** on startup, Docxwise contacts Polar:
   - `POST https://api.polar.sh/v1/customer-portal/license-keys/activate`: reserves one of the key's 5 device slots (sends the key, our public Polar organization ID and a device label such as "Obsidian – macOS – a1b2": app, platform and a random 4-character device code; no vault name, user name or host name).
@@ -81,7 +89,7 @@ Bugs and questions: GitHub issues (repository URL to be added). Billing and refu
 
 ## Credits
 
-docx (MIT), markdown-it and markdown-it-footnote (MIT), Temml (MIT), JSZip (MIT), highlight.js (BSD-3-Clause), citeproc-js (CPAL-1.0, bundled unmodified), CSL styles and locales from the Citation Style Language project (CC BY-SA 3.0). See `THIRD_PARTY_NOTICES.md`.
+Docxwise bundles: docx (MIT, including its vendored fflate, nanoid and adapted stream-browserify code, all MIT), JSZip (MIT option of MIT/GPL-3.0) with pako (MIT and Zlib), markdown-it, markdown-it-footnote, linkify-it, mdurl, uc.micro and punycode.js (MIT), entities (BSD-2-Clause), Temml (MIT), highlight.js (BSD-3-Clause), citeproc-js by Frank Bennett (CPAL-1.0, bundled unmodified; its source is in `third_party/citeproc-2.4.63/`), and CSL styles and the en-US locale from the Citation Style Language project (CC BY-SA 3.0). Full license texts and the CPAL source-code notice are in `THIRD_PARTY_NOTICES.md`, which is also appended to `main.js`.
 
 ## License
 

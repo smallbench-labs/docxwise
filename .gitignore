@@ -3,3 +3,4 @@ out/
 .obsidian-app/
 main.js
 release-audit/lint/node_modules/
+release/

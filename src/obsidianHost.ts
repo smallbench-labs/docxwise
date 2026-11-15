@@ -1,4 +1,7 @@
 import { App, TFile, loadMermaid, normalizePath, requestUrl } from 'obsidian';
+
+/** The part of Obsidian's bundled Mermaid that Docxwise calls (v9 returns a string, v10+ an object). */
+interface MermaidApi { render(id: string, text: string): Promise<string | { svg?: string }> }
 import type { VaultHost } from './core/convert';
 
 export class ObsidianHost implements VaultHost {
@@ -41,11 +44,11 @@ export class ObsidianHost implements VaultHost {
 	async renderMermaid(code: string) {
 		let id = '';
 		try {
-			const mermaid = await loadMermaid();
+			const mermaid = (await loadMermaid()) as MermaidApi;
 			id = `docxwise-mermaid-${Date.now()}-${++this.mermaidSeq}`;
 			const init = '%%{init: {"theme": "default", "htmlLabels": false, "flowchart": {"htmlLabels": false}}}%%\n';
 			const out = await mermaid.render(id, init + code);
-			const svgText: string = typeof out === 'string' ? out : out?.svg;
+			const svgText = typeof out === 'string' ? out : out?.svg;
 			if (!svgText) return null;
 			const doc = new DOMParser().parseFromString(svgText, 'image/svg+xml');
 			const svg = doc.documentElement;
@@ -57,13 +60,13 @@ export class ObsidianHost implements VaultHost {
 				svg.removeAttribute('style'); // drops max-width
 			}
 			const bytes = new TextEncoder().encode(new XMLSerializer().serializeToString(svg));
-			return await this.rasterize(bytes.buffer as ArrayBuffer, 'image/svg+xml', '#ffffff');
-		} catch (e) {
-			console.warn('Docxwise: Mermaid render failed', e);
+			return await this.rasterize(bytes.buffer, 'image/svg+xml', '#ffffff');
+		} catch {
+			// Syntax errors are expected; the caller keeps the diagram as code and lists it in the export notice.
 			return null;
 		} finally {
 			// Mermaid leaves its scratch element behind when a diagram has a syntax error.
-			if (id) document.getElementById(id)?.remove(), document.getElementById('d' + id)?.remove();
+			if (id) { activeDocument.getElementById(id)?.remove(); activeDocument.getElementById('d' + id)?.remove(); }
 		}
 	}
 
@@ -88,7 +91,7 @@ export class ObsidianHost implements VaultHost {
 			await new Promise<void>((ok, bad) => { img.onload = () => ok(); img.onerror = () => bad(new Error('decode')); img.src = url; });
 			const w = img.naturalWidth || 800, h = img.naturalHeight || 600;
 			const scale = 2;
-			const canvas = document.createElement('canvas');
+			const canvas = activeDocument.createElement('canvas');
 			canvas.width = w * scale; canvas.height = h * scale;
 			const g = canvas.getContext('2d');
 			if (!g) return null;

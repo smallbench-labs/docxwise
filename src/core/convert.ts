@@ -1,8 +1,8 @@
 import {
 	AlignmentType, BorderStyle, Document, ExternalHyperlink, Footer, FootnoteReferenceRun, HeadingLevel, ImageRun, LevelFormat,
-	Packer, PageNumber, Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType, ParagraphChild, IParagraphOptions, TableLayoutType,
+	Packer, PageNumber, Paragraph, ShadingType, Table, TableCell, TableRow, TextRun, WidthType, ParagraphChild, IParagraphOptions, IRunOptions, TableLayoutType,
 } from 'docx';
-import type { MarkdownIt, Token } from 'markdown-it';
+import type { Env, MarkdownIt, Token } from 'markdown-it';
 import { createMd, preprocess, CiteItem } from './markdown';
 import { latexToOmml } from './math';
 import { Citer, Cluster, Seg } from './cite';
@@ -49,6 +49,12 @@ function tint(hex: string, f = 0.9): string {
 }
 
 interface TNode { t: Token; kids: TNode[] }
+/** Token.meta set by our Markdown rules and markdown-it-footnote. */
+interface TokenMeta { id?: number; items?: CiteItem[]; narrative?: boolean; [k: string]: unknown }
+/** IRunOptions-typed literal (TextRun also accepts a string, which confuses the deprecation lint about String#italics). */
+const runOpts = (o: IRunOptions): IRunOptions => o;
+/** Paragraphs that finish() replaces with the bibliography. */
+const BIB_MARKERS = new WeakSet<object>();
 function toTree(tokens: Token[]): TNode[] {
 	const root: TNode = { t: null as unknown as Token, kids: [] };
 	const stack = [root];
@@ -63,7 +69,7 @@ function toTree(tokens: Token[]): TNode[] {
 
 interface Box { color: string; fill: string }
 interface Ctx { path: string; level: number; box?: Box; quote: number; depth: number; seen: Set<string>; parse: Parsed; inTable?: boolean }
-interface Parsed { tree: TNode[]; env: any; footnotes: Map<number, TNode[]> }
+interface Parsed { tree: TNode[]; env: Env; footnotes: Map<number, TNode[]> }
 type Block = Paragraph | Table;
 type Fmt = { color?: string; bold?: boolean; italics?: boolean; strike?: boolean; highlight?: boolean; code?: boolean; sup?: boolean; sub?: boolean; underline?: boolean };
 
@@ -93,7 +99,7 @@ export class Converter {
 	private warn(s: string) { if (!this.warnings.includes(s)) this.warnings.push(s); }
 
 	private parse(src: string): Parsed {
-		const env: any = {};
+		const env: Env = {};
 		const tokens = this.md.parse(src, env);
 		const tree = toTree(tokens);
 		const footnotes = new Map<number, TNode[]>();
@@ -145,7 +151,7 @@ export class Converter {
 			if (bib && bib.entries.length) {
 				const bibBlocks: Block[] = [new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun(this.opts.bibliography!.title)] })];
 				for (const e of bib.entries) bibBlocks.push(new Paragraph({ style: 'Bibliography', indent: bib.hanging ? { left: 720, hanging: 720 } : undefined, spacing: { after: 160 }, children: segRuns(e) }));
-				const at = children.findIndex((c) => (c as any).__bib);
+				const at = children.findIndex((c) => BIB_MARKERS.has(c));
 				if (at >= 0) children.splice(at, 1, ...bibBlocks); else children.push(...bibBlocks);
 			}
 		} else if (this.clusters.length) this.warn('This note has citations, but no bibliography file is set. Choose one in Settings → Docxwise → Bibliography file.');
@@ -270,7 +276,7 @@ export class Converter {
 				if (lang === 'dataview') {
 					const r = this.host.dataviewMarkdown ? await this.host.dataviewMarkdown(t.content, ctx.path) : null;
 					if (r && r.ok) {
-						if (!r.markdown.trim()) return [new Paragraph(this.pOpts(ctx, { children: [new TextRun({ text: 'No results.', italics: true, color: '6B7280' })] }))];
+						if (!r.markdown.trim()) return [new Paragraph(this.pOpts(ctx, { children: [new TextRun(runOpts({ text: 'No results.', italics: true, color: '6B7280' }))] }))];
 						const parsed = this.parse(r.markdown);
 						return this.blocks(parsed.tree, { ...ctx, parse: parsed });
 					}
@@ -282,7 +288,7 @@ export class Converter {
 				const runs: TextRun[] = [];
 				for (const sg of segs) sg.text.split('\n').forEach((part, i) => {
 					if (i > 0) runs.push(new TextRun({ break: 1 }));
-					if (part) runs.push(new TextRun({ text: part, color: sg.color, italics: sg.italic || undefined }));
+					if (part) runs.push(new TextRun(runOpts({ text: part, color: sg.color, italics: sg.italic || undefined })));
 				});
 				const o = this.pOpts(ctx, { style: 'SourceCode', children: runs });
 				return [new Paragraph(ctx.box ? { ...o, style: 'SourceCode' } : o)];
@@ -303,7 +309,7 @@ export class Converter {
 	private bibMarker(): Paragraph {
 		// Placeholder object; finish() replaces it with the bibliography.
 		const p = new Paragraph({ children: [] });
-		(p as any).__bib = true;
+		BIB_MARKERS.add(p);
 		return p;
 	}
 
@@ -330,9 +336,9 @@ export class Converter {
 					firstPara = false;
 					const inl = c.kids[0]?.t;
 					const children = inl?.children ?? [];
-					const task = !ordered && children[0]?.type === 'text' ? /^\[([ xX\/-])\]\s/.exec(children[0].content) : null;
+					const task = !ordered && children[0]?.type === 'text' ? /^\[([ xX/-])\]\s/.exec(children[0].content) : null;
 					if (task) {
-						const rest = [Object.assign(Object.create(Object.getPrototypeOf(children[0])), children[0], { content: children[0].content.slice(task[0].length) }), ...children.slice(1)];
+						const rest = [Object.assign(Object.create(Object.getPrototypeOf(children[0]) as object) as Token, children[0], { content: children[0].content.slice(task[0].length) }), ...children.slice(1)];
 						const done = task[1] !== ' ';
 						const runs = await this.inline(rest, ctx, done ? { strike: false } : {});
 						out.push(new Paragraph(this.pOpts(ctx, { indent: { left: 720 + 360 * level, hanging: 360 }, spacing: { after: 60 }, children: [new TextRun({ text: done ? '☒\t' : '☐\t', font: 'Segoe UI Symbol' }), ...runs] })));
@@ -395,7 +401,7 @@ export class Converter {
 		};
 		walk(n.kids, false);
 		const cols = Math.max(...rows.map((r) => r.cells.length));
-		const w = new Array(cols).fill(4);
+		const w: number[] = new Array<number>(cols).fill(4);
 		for (const r of rows) r.cells.forEach((c, i) => { const len = c.tokens.reduce((a, t) => a + (t.content?.length ?? 0), 0); w[i] = Math.max(w[i], Math.min(len, 40)); });
 		const total = (this.opts.page === 'A4' ? 9026 : 9360) - (ctx.box ? 400 : 0);
 		const sum = w.reduce((a, b) => a + b, 0);
@@ -447,14 +453,14 @@ export class Converter {
 			const p = this.host.resolve(decodeURI(src), ctx.path);
 			data = p ? await this.host.readBinary(p) : null;
 		}
-		if (!data) { this.warn(`Image not found: ${src}`); return new TextRun({ text: `[${alt || src}]`, italics: true, color: '6B7280' }); }
+		if (!data) { this.warn(`Image not found: ${src}`); return new TextRun(runOpts({ text: `[${alt || src}]`, italics: true, color: '6B7280' })); }
 		let info = sniffImage(data);
 		if (!info && this.host.rasterize) {
 			const mime = /\.svg$/i.test(src) ? 'image/svg+xml' : /\.webp$/i.test(src) ? 'image/webp' : 'image/*';
 			const r = await this.host.rasterize(data, mime);
 			if (r) { data = r.data; info = { type: 'png', width: r.width, height: r.height }; }
 		}
-		if (!info) { this.warn(`Image format not supported in Word: ${src}`); return new TextRun({ text: `[${alt || src}]`, italics: true, color: '6B7280' }); }
+		if (!info) { this.warn(`Image format not supported in Word: ${src}`); return new TextRun(runOpts({ text: `[${alt || src}]`, italics: true, color: '6B7280' })); }
 		let w = info.width, h = info.height;
 		const sm = sizeSpec ? /^(\d+)(?:x(\d+))?$/.exec(sizeSpec.trim()) : null;
 		if (sm) { const nw = +sm[1]; h = sm[2] ? +sm[2] : Math.round(h * nw / w); w = nw; }
@@ -470,17 +476,17 @@ export class Converter {
 		const fmt: Fmt = { ...base };
 		let link: { href: string; runs: ParagraphChild[] } | null = null;
 		const push = (r: ParagraphChild) => { if (link) link.runs.push(r); else out.push(r); };
-		const text = (s: string, extra: Record<string, unknown> = {}) => new TextRun({
+		const text = (s: string, extra: Record<string, unknown> = {}) => new TextRun(runOpts({
 			text: s, bold: fmt.bold, italics: fmt.italics, strike: fmt.strike, highlight: fmt.highlight ? 'yellow' : undefined,
 			style: fmt.code ? 'VerbatimChar' : link ? 'Hyperlink' : undefined, superScript: fmt.sup, subScript: fmt.sub, color: link ? undefined : fmt.color, underline: fmt.underline ? {} : undefined, ...extra,
-		});
+		}));
 		for (const t of tokens) {
-			const meta = (t.meta ?? {}) as any;
+			const meta = (t.meta ?? {}) as TokenMeta;
 			switch (t.type) {
 				case 'text': {
 					let c = t.content;
 					const nx = tokens[tokens.indexOf(t) + 1];
-					if (this.citer?.isNote && nx?.type === 'citation' && !(nx.meta as any)?.narrative) c = c.replace(/\s+$/, '');
+					if (this.citer?.isNote && nx?.type === 'citation' && !(nx.meta)?.narrative) c = c.replace(/\s+$/, '');
 					if (c) push(text(c));
 					break;
 				}
@@ -574,7 +580,7 @@ export class Converter {
 }
 
 export function segRuns(segs: Seg[]): TextRun[] {
-	return segs.map((s) => new TextRun({ text: s.text, italics: s.i, bold: s.b, smallCaps: s.sc, superScript: s.sup, subScript: s.sub }));
+	return segs.map((s) => new TextRun(runOpts({ text: s.text, italics: s.i, bold: s.b, smallCaps: s.sc, superScript: s.sup, subScript: s.sub })));
 }
 
 export function extractSection(src: string, sub: string): string {

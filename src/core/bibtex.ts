@@ -102,7 +102,7 @@ export function parseBibtex(src: string): CslItem[] {
 			['volume', 'volume'], ['number', 'issue'], ['pages', 'page'], ['doi', 'DOI'], ['url', 'URL'], ['isbn', 'ISBN'], ['issn', 'ISSN'],
 			['edition', 'edition'], ['note', 'note'], ['abstract', 'abstract'], ['institution', 'publisher'], ['school', 'publisher'], ['organization', 'publisher'], ['series', 'collection-title'], ['language', 'language']];
 		for (const [b, c] of map) { const v = t(b); if (v !== undefined && item[c] === undefined) item[c] = c === 'URL' || c === 'DOI' ? fields[b].replace(/[{}]/g, '') : v; }
-		if (item.page) item.page = String(item.page).replace(/\s*[–-]+\s*/g, '–');
+		if (typeof item.page === 'string') item.page = item.page.replace(/\s*[–-]+\s*/g, '–');
 		const container = t('journal') ?? t('journaltitle') ?? t('booktitle');
 		if (container) item['container-title'] = container;
 		if (type === 'phdthesis') item.genre = 'PhD thesis';

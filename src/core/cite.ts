@@ -1,6 +1,6 @@
 // Citations via citeproc-js (CPAL-1.0, bundled unmodified) + CSL styles.
-// @ts-ignore no types
 import CSL from 'citeproc';
+import type { CslEngine } from 'citeproc';
 import type { CiteItem } from './markdown';
 import type { CslItem } from './bibtex';
 import { decodeEntities } from './xml';
@@ -35,10 +35,12 @@ export function htmlToSegs(html: string): Seg[] {
 	return segs;
 }
 
+interface CslName { literal?: string; family?: string; given?: string }
+
 export interface Cluster { id: string; items: CiteItem[]; narrative: boolean; noteIndex: number }
 
 export class Citer {
-	private engine: any;
+	private engine: CslEngine;
 	readonly isNote: boolean;
 	readonly missing = new Set<string>();
 	constructor(private items: Map<string, CslItem>, styleXml: string, localeXml: string) {
@@ -49,10 +51,11 @@ export class Citer {
 	has(key: string): boolean { return this.items.has(key); }
 	/** "Kahneman", "Tversky and Kahneman", "Smith et al." for narrative citations in note styles. */
 	authorName(key: string): string {
-		const it = this.items.get(key) as any;
-		const a: any[] = it?.author ?? it?.editor ?? [];
-		const n = (p: any) => p.literal ?? p.family ?? '';
-		if (!a.length) return it?.title ?? key;
+		const it = this.items.get(key);
+		const names = (v: unknown): CslName[] => (Array.isArray(v) ? (v as CslName[]) : []);
+		const a = names(it?.author).length ? names(it?.author) : names(it?.editor);
+		const n = (p: CslName) => p.literal ?? p.family ?? '';
+		if (!a.length) return typeof it?.title === 'string' ? it.title : key;
 		if (a.length === 1) return n(a[0]);
 		if (a.length === 2) return `${n(a[0])} and ${n(a[1])}`;
 		return `${n(a[0])} et al.`;
@@ -62,7 +65,7 @@ export class Citer {
 	format(clusters: Cluster[]): Map<string, Seg[]> {
 		const out = new Map<string, Seg[]>();
 		const used: string[] = [];
-		const csl: any[] = [];
+		const csl: object[] = [];
 		const narrativeParts: { id: string; author: string; rest: string }[] = [];
 		for (const c of clusters) {
 			const ok = c.items.filter((it) => { if (!this.items.has(it.key)) { this.missing.add(it.key); return false; } return true; });
@@ -91,7 +94,7 @@ export class Citer {
 	bibliography(): { entries: Seg[][]; hanging: boolean; lineSpacing: number; entrySpacing: number } | null {
 		const r = this.engine.makeBibliography();
 		if (!r) return null;
-		const [params, entries] = r as [any, string[]];
+		const [params, entries] = r;
 		return {
 			entries: entries.map((e) => htmlToSegs(e.replace(/<div class="csl-left-margin">(.*?)<\/div>/, '$1\t').replace(/<\/?div[^>]*>/g, '').trim())),
 			hanging: !!params.hangingindent, lineSpacing: params.linespacing || 1, entrySpacing: params.entryspacing || 0,

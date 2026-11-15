@@ -190,7 +190,7 @@ export interface MathResult { omml: string; ok: boolean; error?: string }
 
 export function latexToOmml(latex: string, display: boolean): MathResult {
 	try {
-		const mml = temml.renderToString(latex, { xml: true, displayMode: display, throwOnError: true, trust: false } as never);
+		const mml = temml.renderToString(latex, { xml: true, displayMode: display, throwOnError: true, trust: false });
 		INLINE = !display;
 		const body = conv(parseXml(mml));
 		const omml = `<m:oMath>${body}</m:oMath>`;

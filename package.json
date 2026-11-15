@@ -1,13 +1,14 @@
 {
   "name": "docxwise",
   "version": "0.1.0",
-  "description": "",
+  "description": "Export Obsidian notes to .docx without Pandoc.",
   "scripts": {
-    "build": "tsc --noEmit -p . && node esbuild.config.mjs production",
-    "test": "esbuild test/license.ts --bundle --platform=node --outfile=out/license.cjs --log-level=warning && node out/license.cjs && esbuild test/run.ts --bundle --platform=node --outfile=out/run.cjs --log-level=warning && node out/run.cjs && python3 test/check.py out/research-apa.docx out/research-chicago-notes.docx out/edge-cases.docx out/long-note.docx out/merged-pro.docx"
+    "build": "node tools/gen-notices.mjs && tsc --noEmit -p . && node esbuild.config.mjs production",
+    "test": "esbuild test/license.ts --bundle --platform=node --outfile=out/license.cjs --log-level=warning && node out/license.cjs && esbuild test/run.ts --bundle --platform=node --outfile=out/run.cjs --log-level=warning && node out/run.cjs && python3 test/check.py out/research-apa.docx out/research-chicago-notes.docx out/edge-cases.docx out/long-note.docx out/merged-pro.docx",
+    "lint": "eslint ."
   },
   "keywords": [],
-  "author": "",
+  "author": "Smallbench Labs",
   "license": "MIT",
   "type": "commonjs",
   "dependencies": {

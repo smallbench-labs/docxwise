@@ -4,13 +4,13 @@
 .dw-consent input[type="checkbox"] { margin: 0.2em 0 0; flex: none; }
 .dw-consent-text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
 .dw-consent-link { color: var(--text-accent); text-decoration: underline; }
-.theme-light .dw-consent-link { color: color-mix(in srgb, var(--text-accent) 65%, black); }
+.theme-light .dw-consent-link { color: color-mix(in srgb, var(--text-accent) 65%, var(--text-normal)); }
 .dw-buy-button { margin-top: 8px; }
 .dw-buy-button[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
 .dw-consent-hint { margin-top: 6px; color: var(--text-muted); font-size: var(--font-ui-small); }
 .dw-consent-hint.dw-consent-hint-error { color: var(--text-error); }
-.theme-light .dw-consent-hint.dw-consent-hint-error { color: color-mix(in srgb, var(--text-error) 80%, black); }
-.theme-dark .dw-consent-hint.dw-consent-hint-error { color: color-mix(in srgb, var(--text-error) 85%, white); }
+.theme-light .dw-consent-hint.dw-consent-hint-error { color: color-mix(in srgb, var(--text-error) 80%, var(--text-normal)); }
+.theme-dark .dw-consent-hint.dw-consent-hint-error { color: color-mix(in srgb, var(--text-error) 85%, var(--text-normal)); }
 .dw-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .dw-consent input[type="checkbox"]:focus-visible { outline: 2px solid var(--interactive-accent); outline-offset: 2px; }
 
