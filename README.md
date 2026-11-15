@@ -1,5 +1,5 @@
-<!-- DRAFT (not published). Placeholders to resolve before release: checkout gate entry for product=docxwise-pro,
-     formchime.com/docxwise/terms and /privacy pages, Polar product + benefit id, GitHub repo URL. -->
+<!-- DRAFT (not published). Placeholders to resolve before release: checkout gate entry for product=docxwise-pro
+     (local branch, disabled), formchime.com/docxwise/terms and /privacy pages (drafts, not deployed), GitHub repo URL. -->
 # Docxwise
 
 Export Obsidian notes to clean, editable Word (`.docx`) files. No Pandoc, no extra installs; works on desktop and mobile.
