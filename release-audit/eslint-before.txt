@@ -1,0 +1,102 @@
+
+/workspace/obsidian-pipeline/docx-export/src/core/bibtex.ts
+  105:37  error  'item.page' will use Object's default stringification format ('[object Object]') when stringified  @typescript-eslint/no-base-to-string
+
+/workspace/obsidian-pipeline/docx-export/src/core/cite.ts
+  41:18  warning  Unexpected any. Specify a different type                           @typescript-eslint/no-explicit-any
+  46:3   error    Unsafe assignment of an `any` value                                @typescript-eslint/no-unsafe-assignment
+  46:17  error    Unsafe construction of an `any` typed value                        @typescript-eslint/no-unsafe-call
+  46:25  error    Unsafe member access .Engine on an `any` value                     @typescript-eslint/no-unsafe-member-access
+  47:29  error    Unsafe member access .opt on an `any` value                        @typescript-eslint/no-unsafe-member-access
+  52:9   error    Unsafe assignment of an `any` value                                @typescript-eslint/no-unsafe-assignment
+  52:37  warning  Unexpected any. Specify a different type                           @typescript-eslint/no-explicit-any
+  53:9   error    Unsafe assignment of an `any` value                                @typescript-eslint/no-unsafe-assignment
+  53:12  warning  Unexpected any. Specify a different type                           @typescript-eslint/no-explicit-any
+  53:24  error    Unsafe member access .author on an `any` value                     @typescript-eslint/no-unsafe-member-access
+  53:38  error    Unsafe member access .editor on an `any` value                     @typescript-eslint/no-unsafe-member-access
+  54:17  warning  Unexpected any. Specify a different type                           @typescript-eslint/no-explicit-any
+  54:25  error    Unsafe return of a value of type `any`                             @typescript-eslint/no-unsafe-return
+  54:27  error    Unsafe member access .literal on an `any` value                    @typescript-eslint/no-unsafe-member-access
+  54:40  error    Unsafe member access .family on an `any` value                     @typescript-eslint/no-unsafe-member-access
+  55:18  error    Unsafe return of a value of type `any`                             @typescript-eslint/no-unsafe-return
+  55:29  error    Unsafe member access .title on an `any` value                      @typescript-eslint/no-unsafe-member-access
+  56:23  error    Unsafe return of a value of type `any`                             @typescript-eslint/no-unsafe-return
+  65:14  warning  Unexpected any. Specify a different type                           @typescript-eslint/no-explicit-any
+  78:3   error    Unsafe call of an `any` typed value                                @typescript-eslint/no-unsafe-call
+  78:15  error    Unsafe member access .updateItems on an `any` value                @typescript-eslint/no-unsafe-member-access
+  79:9   error    Unsafe assignment of an `any` value                                @typescript-eslint/no-unsafe-assignment
+  79:56  error    Unsafe call of an `any` typed value                                @typescript-eslint/no-unsafe-call
+  79:68  error    Unsafe member access .rebuildProcessorState on an `any` value      @typescript-eslint/no-unsafe-member-access
+  92:9   error    Unsafe assignment of an `any` value                                @typescript-eslint/no-unsafe-assignment
+  92:13  error    Unsafe call of an `any` typed value                                @typescript-eslint/no-unsafe-call
+  92:25  error    Unsafe member access .makeBibliography on an `any` value           @typescript-eslint/no-unsafe-member-access
+  94:10  error    Unsafe array destructuring of a tuple element with an `any` value  @typescript-eslint/no-unsafe-assignment
+  94:35  warning  Unexpected any. Specify a different type                           @typescript-eslint/no-explicit-any
+  97:22  error    Unsafe member access .hangingindent on an `any` value              @typescript-eslint/no-unsafe-member-access
+  97:37  error    Unsafe assignment of an `any` value                                @typescript-eslint/no-unsafe-assignment
+  97:57  error    Unsafe member access .linespacing on an `any` value                @typescript-eslint/no-unsafe-member-access
+  97:75  error    Unsafe assignment of an `any` value                                @typescript-eslint/no-unsafe-assignment
+  97:96  error    Unsafe member access .entryspacing on an `any` value               @typescript-eslint/no-unsafe-member-access
+
+/workspace/obsidian-pipeline/docx-export/src/core/convert.ts
+   66:40   warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+   96:14   warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+   97:37   error    Unsafe argument of type `any` assigned to a parameter of type `Env`            @typescript-eslint/no-unsafe-argument
+  107:74   error    Unsafe assignment of an `any` value                                            @typescript-eslint/no-unsafe-assignment
+  148:48   warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  148:53   error    Unsafe member access .__bib on an `any` value                                  @typescript-eslint/no-unsafe-member-access
+  273:117  warning  `italics` is deprecated. A legacy feature for browser compatibility            @typescript-eslint/no-deprecated
+  285:69   warning  `italics` is deprecated. A legacy feature for browser compatibility            @typescript-eslint/no-deprecated
+  306:9    warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  306:14   error    Unsafe member access .__bib on an `any` value                                  @typescript-eslint/no-unsafe-member-access
+  333:71   error    Unnecessary escape character: \/                                               no-useless-escape
+  335:49   error    Unsafe argument of type `any` assigned to a parameter of type `object | null`  @typescript-eslint/no-unsafe-argument
+  337:38   error    Unsafe argument of type `any[]` assigned to a parameter of type `Token[]`      @typescript-eslint/no-unsafe-argument
+  366:54   error    Unsafe argument of type `any` assigned to a parameter of type `Env`            @typescript-eslint/no-unsafe-argument
+  369:125  error    Unsafe argument of type `any` assigned to a parameter of type `Env`            @typescript-eslint/no-unsafe-argument
+  399:141  error    Unsafe argument of type `any` assigned to a parameter of type `number`         @typescript-eslint/no-unsafe-argument
+  401:9    error    Unsafe assignment of an `any` value                                            @typescript-eslint/no-unsafe-assignment
+  401:34   error    Unsafe return of a value of type `any`                                         @typescript-eslint/no-unsafe-return
+  450:100  warning  `italics` is deprecated. A legacy feature for browser compatibility            @typescript-eslint/no-deprecated
+  457:119  warning  `italics` is deprecated. A legacy feature for browser compatibility            @typescript-eslint/no-deprecated
+  474:13   warning  `bold` is deprecated. A legacy feature for browser compatibility               @typescript-eslint/no-deprecated
+  474:29   warning  `italics` is deprecated. A legacy feature for browser compatibility            @typescript-eslint/no-deprecated
+  474:51   warning  `strike` is deprecated. A legacy feature for browser compatibility             @typescript-eslint/no-deprecated
+  478:10   error    Unsafe assignment of an `any` value                                            @typescript-eslint/no-unsafe-assignment
+  478:35   warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  483:72   warning  Unexpected any. Specify a different type                                       @typescript-eslint/no-explicit-any
+  483:78   error    Unsafe member access .narrative on an `any` value                              @typescript-eslint/no-unsafe-member-access
+  529:22   error    Unsafe member access .id on an `any` value                                     @typescript-eslint/no-unsafe-member-access
+  541:25   error    Unsafe member access .items on an `any` value                                  @typescript-eslint/no-unsafe-member-access
+  547:16   error    Unsafe member access .narrative on an `any` value                              @typescript-eslint/no-unsafe-member-access
+  550:62   error    Unsafe member access .narrative on an `any` value                              @typescript-eslint/no-unsafe-member-access
+  577:53   warning  `italics` is deprecated. A legacy feature for browser compatibility            @typescript-eslint/no-deprecated
+  577:67   warning  `bold` is deprecated. A legacy feature for browser compatibility               @typescript-eslint/no-deprecated
+
+/workspace/obsidian-pipeline/docx-export/src/core/markdown.ts
+  40:9  error  Unsafe argument of type `any` assigned to a parameter of type `(md: MarkdownIt) => void`  @typescript-eslint/no-unsafe-argument
+
+/workspace/obsidian-pipeline/docx-export/src/core/math.ts
+  193:43  error  This assertion is unnecessary since the receiver accepts the original type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+
+/workspace/obsidian-pipeline/docx-export/src/main.ts
+  219:34   error    This assertion is unnecessary since the receiver accepts the original type of the expression                                                                                                               @typescript-eslint/no-unnecessary-type-assertion
+  231:8    error    Unsafe assignment of an `any` value                                                                                                                                                                        @typescript-eslint/no-unsafe-assignment
+  242:109  error    This assertion is unnecessary since it does not change the type of the expression                                                                                                                          @typescript-eslint/no-unnecessary-type-assertion
+  258:7    warning  This PluginSettingTab does not implement getSettingDefinitions(); its settings will not appear in Obsidian's settings search for users on 1.13.0 or later. Consider adopting the declarative settings API  obsidianmd/settings-tab/prefer-setting-definitions
+
+/workspace/obsidian-pipeline/docx-export/src/obsidianHost.ts
+  44:10  error    Unsafe assignment of an `any` value                                                @typescript-eslint/no-unsafe-assignment
+  47:10  error    Unsafe assignment of an `any` value                                                @typescript-eslint/no-unsafe-assignment
+  47:22  error    Unsafe call of an `any` typed value                                                @typescript-eslint/no-unsafe-call
+  47:30  error    Unsafe member access .render on an `any` value                                     @typescript-eslint/no-unsafe-member-access
+  48:10  error    Unsafe assignment of an `any` value                                                @typescript-eslint/no-unsafe-assignment
+  48:65  error    Unsafe member access .svg on an `any` value                                        @typescript-eslint/no-unsafe-member-access
+  60:32  error    This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+  66:12  warning  Expected an assignment or function call and instead saw an expression              @typescript-eslint/no-unused-expressions
+  66:12  warning  Use 'activeDocument' instead of 'document' for popout window compatibility         obsidianmd/prefer-active-doc
+  66:51  warning  Use 'activeDocument' instead of 'document' for popout window compatibility         obsidianmd/prefer-active-doc
+
+✖ 84 problems (59 errors, 25 warnings)
+  4 errors and 12 warnings potentially fixable with the `--fix` option.
+

@@ -1,0 +1,5 @@
+node_modules/
+out/
+.obsidian-app/
+main.js
+release-audit/lint/node_modules/

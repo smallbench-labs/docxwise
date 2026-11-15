@@ -1,0 +1,10 @@
+{
+	"id": "docxwise",
+	"name": "Docxwise",
+	"version": "0.1.0",
+	"minAppVersion": "1.5.0",
+	"description": "Export notes to clean .docx files without Pandoc, with editable equations, citations, callouts, embeds and tables. Optional Pro upgrade.",
+	"author": "Smallbench Labs",
+	"authorUrl": "https://github.com/smallbench-labs",
+	"isDesktopOnly": false
+}
