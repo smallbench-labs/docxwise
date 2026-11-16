@@ -1,6 +1,3 @@
-<!-- DRAFT (not published). Remaining before release: checkout gate entry for product=docxwise-pro
-     (local branch, disabled, not deployed), formchime.com/docxwise/terms and /privacy pages (prepared, not deployed).
-     Repo URL below is https://github.com/smallbench-labs/docxwise — the GitHub repo has not been created yet. -->
 # Docxwise
 
 Export Obsidian notes to clean, editable Word (`.docx`) files. No Pandoc, no extra installs; works on desktop and mobile.
