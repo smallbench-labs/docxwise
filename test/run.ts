@@ -5,6 +5,7 @@ import { parseBibtex } from '../src/core/bibtex';
 
 const vault = path.resolve(__dirname, '../test-vault');
 const outDir = path.resolve(__dirname, '../out');
+const templateFile = path.resolve(__dirname, '../test/fixtures/template.docx');
 fs.mkdirSync(outDir, { recursive: true });
 const all: string[] = [];
 const walk = (d: string) => { for (const f of fs.readdirSync(d)) { const p = path.join(d, f); fs.statSync(p).isDirectory() ? walk(p) : all.push(path.relative(vault, p)); } };
@@ -38,8 +39,8 @@ async function run(style: string, title: string, out: string, extra: Record<stri
 (async () => {
 	await run('apa.csl', 'References', 'research-apa.docx');
 	await run('chicago-notes-bibliography.csl', 'Bibliography', 'research-chicago-notes.docx', { page: 'Letter' });
-	if (fs.existsSync(path.join(outDir, 'template.docx'))) {
-		const b = fs.readFileSync(path.join(outDir, 'template.docx'));
+	if (fs.existsSync(templateFile)) {
+		const b = fs.readFileSync(templateFile);
 		await run('chicago-author-date.csl', 'References', 'research-template.docx', { template: b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) });
 	}
 })().catch((e) => { console.error(e); process.exit(1); });
@@ -64,7 +65,7 @@ async function run(style: string, title: string, out: string, extra: Record<stri
 
 (async () => {
 	await new Promise((r) => setTimeout(r, 6000));
-	const b = fs.readFileSync(path.join(outDir, 'template.docx'));
+	const b = fs.readFileSync(templateFile);
 	const c = new Converter(host, { page: 'Letter', breaks: true, title: 'auto', pageNumbers: true, wikilinks: 'text', template: b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength), bibliography: { items, styleXml: asset('apa.csl'), localeXml: asset('locales-en-US.xml'), title: 'References' } });
 	const notes = ['Notes/Methods.md', 'Glossary.md', 'Notes/Edge Cases.md'].map((p) => ({ markdown: fs.readFileSync(path.join(vault, p), 'utf8'), path: p, title: path.basename(p, '.md') }));
 	const r = await c.convertMany(notes);
