@@ -1,5 +1,6 @@
-<!-- DRAFT (not published). Placeholders to resolve before release: checkout gate entry for product=docxwise-pro
-     (local branch, disabled), formchime.com/docxwise/terms and /privacy pages (drafts, not deployed), GitHub repo URL. -->
+<!-- DRAFT (not published). Remaining before release: checkout gate entry for product=docxwise-pro
+     (local branch, disabled, not deployed), formchime.com/docxwise/terms and /privacy pages (prepared, not deployed).
+     Repo URL below is https://github.com/smallbench-labs/docxwise — the GitHub repo has not been created yet. -->
 # Docxwise
 
 Export Obsidian notes to clean, editable Word (`.docx`) files. No Pandoc, no extra installs; works on desktop and mobile.
@@ -85,7 +86,7 @@ Per-note overrides in properties: `bibliography: refs/other.bib`, `csl: refs/nat
 
 ## Support
 
-Bugs and questions: GitHub issues (repository URL to be added). Billing and refunds: support@formchime.com.
+Bugs and questions: [GitHub issues](https://github.com/smallbench-labs/docxwise/issues). Billing and refunds: support@formchime.com.
 
 ## Credits
 
