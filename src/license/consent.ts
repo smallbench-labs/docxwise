@@ -2,7 +2,7 @@
  * Purchase consent next to "Buy Pro". Pure, no `obsidian` import.
  * Never persisted: a fresh ConsentState (unchecked) is created each time the settings tab is drawn.
  */
-// PLACEHOLDER (2026-11-14): these Docxwise pages do not exist yet; publish them before CHECKOUT_READY is turned on.
+// Live since 2026-11-16 (effective 2026-11-17).
 export const TERMS_URL = 'https://formchime.com/docxwise/terms';
 export const PRIVACY_URL = 'https://formchime.com/docxwise/privacy';
 export const CONSENT_HINT = 'Check the box above to continue.';

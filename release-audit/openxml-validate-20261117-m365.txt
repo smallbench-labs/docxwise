@@ -1,0 +1,10 @@
+OpenXmlValidator  FileFormatVersions.Microsoft365
+
+FILE	Big.docx	0 error(s)	/workspace/obsidian-pipeline/docx-export/release-audit/qa-0.1.1-20261117/docx/Big.docx
+FILE	Empty.docx	0 error(s)	/workspace/obsidian-pipeline/docx-export/release-audit/qa-0.1.1-20261117/docx/Empty.docx
+FILE	Research-APA.docx	0 error(s)	/workspace/obsidian-pipeline/docx-export/release-audit/qa-0.1.1-20261117/docx/Research-APA.docx
+FILE	Research-ChicagoNotes.docx	0 error(s)	/workspace/obsidian-pipeline/docx-export/release-audit/qa-0.1.1-20261117/docx/Research-ChicagoNotes.docx
+FILE	Title.docx	0 error(s)	/workspace/obsidian-pipeline/docx-export/release-audit/qa-0.1.1-20261117/docx/Title.docx
+FILE	Welcome.docx	0 error(s)	/workspace/obsidian-pipeline/docx-export/release-audit/qa-0.1.1-20261117/docx/Welcome.docx
+
+SUMMARY	files=6	files_with_errors=0	total_errors=0	version=Microsoft365

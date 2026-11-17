@@ -69,7 +69,7 @@ export default class DocxwisePlugin extends Plugin {
 		this.addCommand({
 			id: 'export-folder-merged',
 			name: 'Export a folder as one .docx (Pro)',
-			callback: () => new FolderPicker(this.app, (folder) => void this.exportFolder(folder)).open(),
+			callback: () => { if (!this.requirePro('Merging notes')) return; new FolderPicker(this.app, (folder) => void this.exportFolder(folder)).open(); },
 		});
 		this.addCommand({
 			id: 'export-linked-merged',
@@ -284,7 +284,7 @@ class DocxwiseSettingTab extends PluginSettingTab {
 			if (gate.failed()) { new Setting(el).setName('Docxwise Pro').setDesc('Couldn\'t check your region. Reopen settings later to try again.'); return; }
 			if (!gate.visible()) return; // blocked region (Japan): no purchase option
 			const st = new Setting(el).setName('Get Docxwise Pro')
-				.setDesc('Your own Word templates and several notes merged into one document. US$19 once (plus tax), all future updates, 5 devices, 14-day refund; not available in Japan (see README).');
+				.setDesc('Your own Word templates and several notes merged into one document. US$19 once (plus tax), all future updates, 5 devices, 14-day refund; not sold in Japan.');
 			const consent = this.consent = new ConsentState();
 			buildConsentBlock(st.infoEl, consent, () => openCheckoutIfConsented(consent, CHECKOUT_URL, (u) => {
 				if (!CHECKOUT_READY) { new Notice('Docxwise Pro is not on sale yet.'); return; }

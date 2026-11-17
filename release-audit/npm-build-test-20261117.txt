@@ -1,0 +1,48 @@
+
+> docxwise@0.1.1 build
+> node tools/gen-notices.mjs && tsc --noEmit -p . && node esbuild.config.mjs production
+
+THIRD_PARTY_NOTICES.md: 27586 chars, 17 components
+
+  main.js  1.5mb ⚠️
+
+⚡ Done in 71ms
+
+> docxwise@0.1.1 test
+> esbuild test/license.ts --bundle --platform=node --outfile=out/license.cjs --log-level=warning && node out/license.cjs && esbuild test/run.ts --bundle --platform=node --outfile=out/run.cjs --log-level=warning && node out/run.cjs && python3 test/check.py out/research-apa.docx out/research-chicago-notes.docx out/edge-cases.docx out/long-note.docx out/merged-pro.docx
+
+PASS JP blocked
+PASS TW allowed
+PASS 500 -> error (fail closed)
+PASS bad body -> error
+PASS throw -> error
+PASS timeout -> error
+PASS BuyGate JP: hidden, no error note
+PASS BuyGate failure: hidden + note
+PASS no checkout without consent
+PASS checkout handler runs after consent
+PASS CHECKOUT_READY is true in the sale build
+PASS checkout URL is the gate docxwise-pro entry
+PASS placeholder IDs: not configured
+PASS placeholder IDs: activate makes no request, no Pro
+PASS shipped config: configured only with a real benefit UUID
+PASS shipped config: not the Streakwise benefit
+PASS other product key (wrong benefit_id) rejected
+PASS matching benefit_id unlocks Pro
+all license tests passed
+research-apa.docx 44512 bytes 150 ms warnings: []
+research-chicago-notes.docx 44803 bytes 83 ms warnings: []
+research-template.docx 59389 bytes 56 ms warnings: []
+edge-cases.docx 12943 warnings: [
+  'Equation could not be converted, kept as text: \\frac{1}{',
+  'Image not found: nope.png',
+  'Embedded note not found: Ghost note',
+  'Citation key not found in bibliography: @missingkey'
+]
+long-note.docx 18614 bytes 164 ms
+merged-pro.docx 28131 warnings: 4
+out/research-apa.docx xml-ok oMath: 8 leftover placeholders: 0
+out/research-chicago-notes.docx xml-ok oMath: 8 leftover placeholders: 0
+out/edge-cases.docx xml-ok oMath: 3 leftover placeholders: 0
+out/long-note.docx xml-ok oMath: 300 leftover placeholders: 0
+out/merged-pro.docx xml-ok oMath: 4 leftover placeholders: 0

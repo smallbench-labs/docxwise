@@ -28,7 +28,8 @@ const now = () => Promise.resolve();
 	ok(!openCheckoutIfConsented(c, CHECKOUT_URL, (u) => opened.push(u)) && opened.length === 0, 'no checkout without consent');
 	c.set(true);
 	ok(openCheckoutIfConsented(c, CHECKOUT_URL, (u) => opened.push(u)) && opened.length === 1, 'checkout handler runs after consent');
-	ok(CHECKOUT_READY === false, 'CHECKOUT_READY is false (placeholder)');
+	ok(CHECKOUT_READY === true, 'CHECKOUT_READY is true in the sale build');
+	ok(CHECKOUT_URL === 'https://formchime.com/api/checkout?product=docxwise-pro', 'checkout URL is the gate docxwise-pro entry');
 
 	// Placeholder config: benefit TBD -> not configured -> no network at all.
 	let calls = 0;

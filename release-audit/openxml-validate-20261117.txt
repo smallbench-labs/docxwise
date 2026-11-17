@@ -1,0 +1,21 @@
+Installing .NET 8 SDK into /tmp/dotnet-sdk (temporary; not a system install)...
+dotnet-install: Attempting to download using aka.ms link https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.428/dotnet-sdk-8.0.428-linux-x64.tar.gz
+dotnet-install: Remote file https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.428/dotnet-sdk-8.0.428-linux-x64.tar.gz size is 217266728 bytes.
+dotnet-install: Extracting archive from https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.428/dotnet-sdk-8.0.428-linux-x64.tar.gz
+dotnet-install: Downloaded file size is 217266728 bytes.
+dotnet-install: The remote and local file sizes are equal.
+dotnet-install: Installed version is 8.0.428
+dotnet-install: Binaries of dotnet can be found in /tmp/dotnet-sdk
+dotnet-install: Note that the script does not resolve dependencies during installation.
+dotnet-install: To check the list of dependencies, go to https://learn.microsoft.com/dotnet/core/install, select your operating system and check the "Dependencies" section.
+dotnet-install: Installation finished successfully.
+OpenXmlValidator  FileFormatVersions.Office2019
+
+FILE	Big.docx	0 error(s)	/workspace/obsidian-pipeline/docx-export/release-audit/qa-0.1.1-20261117/docx/Big.docx
+FILE	Empty.docx	0 error(s)	/workspace/obsidian-pipeline/docx-export/release-audit/qa-0.1.1-20261117/docx/Empty.docx
+FILE	Research-APA.docx	0 error(s)	/workspace/obsidian-pipeline/docx-export/release-audit/qa-0.1.1-20261117/docx/Research-APA.docx
+FILE	Research-ChicagoNotes.docx	0 error(s)	/workspace/obsidian-pipeline/docx-export/release-audit/qa-0.1.1-20261117/docx/Research-ChicagoNotes.docx
+FILE	Title.docx	0 error(s)	/workspace/obsidian-pipeline/docx-export/release-audit/qa-0.1.1-20261117/docx/Title.docx
+FILE	Welcome.docx	0 error(s)	/workspace/obsidian-pipeline/docx-export/release-audit/qa-0.1.1-20261117/docx/Welcome.docx
+
+SUMMARY	files=6	files_with_errors=0	total_errors=0	version=Office2019

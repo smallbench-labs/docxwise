@@ -3,10 +3,10 @@
  * Never link a Polar checkout page directly: the gate blocks Japan and
  * creates the Polar checkout server-side.
  */
-// PLACEHOLDER (2026-11-14): the gate has no 'docxwise-pro' entry and no Polar product exists yet.
-// Keep CHECKOUT_READY false until both are created (needs Roger's approval). While false, Buy Pro shows a notice instead of opening checkout.
+// The Polar product exists and the gate entry 'docxwise-pro' is enabled on the day this version goes to review.
+// If this is ever false, Buy Pro shows a notice instead of opening checkout.
 export const CHECKOUT_URL = 'https://formchime.com/api/checkout?product=docxwise-pro';
-export const CHECKOUT_READY = false;
+export const CHECKOUT_READY = true;
 export const REGION_URL = 'https://formchime.com/api/region';
 
 export type HttpGetJson = (url: string) => Promise<{ status: number; json: unknown }>;
