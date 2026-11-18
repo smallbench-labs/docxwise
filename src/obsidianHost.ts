@@ -91,7 +91,7 @@ export class ObsidianHost implements VaultHost {
 			await new Promise<void>((ok, bad) => { img.onload = () => ok(); img.onerror = () => bad(new Error('decode')); img.src = url; });
 			const w = img.naturalWidth || 800, h = img.naturalHeight || 600;
 			const scale = 2;
-			const canvas = activeDocument.createElement('canvas');
+			const canvas = createEl('canvas');
 			canvas.width = w * scale; canvas.height = h * scale;
 			const g = canvas.getContext('2d');
 			if (!g) return null;

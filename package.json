@@ -1,6 +1,6 @@
 {
   "name": "docxwise",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Export Obsidian notes to .docx without Pandoc.",
   "scripts": {
     "build": "node tools/gen-notices.mjs && tsc --noEmit -p . && node esbuild.config.mjs production",

@@ -1,4 +1,4 @@
-import { AbstractInputSuggest, App, FuzzySuggestModal, Menu, Notice, Platform, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile, TFolder, normalizePath } from 'obsidian';
+import { AbstractInputSuggest, App, FuzzySuggestModal, Menu, Notice, Platform, Plugin, PluginSettingTab, Setting, SettingDefinitionGroup, SettingDefinitionItem, TAbstractFile, TFile, TFolder, normalizePath, requireApiVersion } from 'obsidian';
 import { Converter, ExportOptions } from './core/convert';
 import { parseBibtex, CslItem } from './core/bibtex';
 import { ObsidianHost } from './obsidianHost';
@@ -253,6 +253,10 @@ class FolderPicker extends FuzzySuggestModal<TFolder> {
 	onChooseItem(f: TFolder): void { this.pick(f); }
 }
 
+/** One settings row. The same rows feed getSettingDefinitions() (Obsidian 1.13+) and display() (older). */
+interface Row { name: string; desc?: string; visible?: () => boolean; build?: (st: Setting) => unknown }
+interface Section { heading?: string; rows: Row[] }
+
 class DocxwiseSettingTab extends PluginSettingTab {
 	private buyGate: BuyGate | null = null;
 	private consent: ConsentState | null = null;
@@ -261,88 +265,131 @@ class DocxwiseSettingTab extends PluginSettingTab {
 
 	hide(): void { this.buyGate = null; this.consent = null; }
 
+	/** Re-render after a change that adds, removes or rewrites rows: update() on 1.13+, the legacy renderer before. */
+	private refresh(): void {
+		if (requireApiVersion('1.13.0')) this.update();
+		else this.renderLegacy();
+	}
+
 	/** Same flow as Streakwise 0.2.1: status, Buy Pro (region-gated, consent first), device, key. */
-	private proSection(el: HTMLElement): void {
+	private proRows(): Row[] {
 		const s = this.plugin.settings;
 		const lic = this.plugin.license;
 		const pro = lic.isPro();
-		new Setting(el).setName('Pro').setHeading();
-		new Setting(el).setName('Word template').setDesc('Pro. A .docx or .dotx in your vault. Its fonts, heading styles, colors, header, footer and language are used for every export.')
-			.addText((t) => {
+		const rows: Row[] = [];
+		rows.push({ name: 'Word template', desc: 'Pro. A .docx or .dotx in your vault. Its fonts, heading styles, colors, header, footer and language are used for every export.',
+			build: (st) => st.addText((t) => {
 				const set = async (v: string) => { s.templateFile = v.trim(); await this.plugin.saveSettings(); };
 				t.setPlaceholder('Templates/report.dotx').setValue(s.templateFile).setDisabled(!pro).onChange(set);
 				if (pro) new PathSuggest(this.app, t.inputEl, /\.(docx|dotx)$/i, (p) => void set(p));
-			});
+			}) });
 		const status = pro ? `Pro is active. Works offline for ${lic.graceDaysLeft()} more day${lic.graceDaysLeft() === 1 ? '' : 's'}.`
 			: lic.state.status === 'invalid' ? 'Pro is locked: this key isn\'t active.' : 'You\'re on the free version.';
-		new Setting(el).setName('Status').setDesc(lic.state.message ? `${status} ${lic.state.message}` : status);
+		rows.push({ name: 'Status', desc: lic.state.message ? `${status} ${lic.state.message}` : status,
+			// The region check starts when the tab is rendered (not when it is indexed for search), once per session.
+			build: () => { const gate = this.buyGate ?? (this.buyGate = new BuyGate(obsidianHttpGetJson)); void gate.ensure(() => this.refresh()); } });
 
-		const gate = this.buyGate ?? (this.buyGate = new BuyGate(obsidianHttpGetJson));
-		const buyRows = () => {
-			if (pro) return;
-			if (gate.current === 'unknown') { new Setting(el).setName('Checking region…'); return; }
-			if (gate.failed()) { new Setting(el).setName('Docxwise Pro').setDesc('Couldn\'t check your region. Reopen settings later to try again.'); return; }
-			if (!gate.visible()) return; // blocked region (Japan): no purchase option
-			const st = new Setting(el).setName('Get Docxwise Pro')
-				.setDesc('Your own Word templates and several notes merged into one document. US$19 once (plus tax), all future updates, 5 devices, 14-day refund; not sold in Japan.');
-			const consent = this.consent = new ConsentState();
-			buildConsentBlock(st.infoEl, consent, () => openCheckoutIfConsented(consent, CHECKOUT_URL, (u) => {
-				if (!CHECKOUT_READY) { new Notice('Docxwise Pro is not on sale yet.'); return; }
-				window.open(u);
-			}), (u) => { window.open(u); });
-		};
-		void gate.ensure(() => this.display());
+		const gateState = () => this.buyGate?.current ?? 'unknown';
+		const buyRows: Row[] = [
+			{ name: 'Checking region…', visible: () => !pro && gateState() === 'unknown' },
+			{ name: 'Docxwise Pro', desc: 'Couldn\'t check your region. Reopen settings later to try again.', visible: () => !pro && gateState() === 'error' },
+			// Blocked region (Japan): no purchase option.
+			{ name: 'Get Docxwise Pro', desc: 'Your own Word templates and several notes merged into one document. US$19 once (plus tax), all future updates, 5 devices, 14-day refund; not sold in Japan.',
+				visible: () => !pro && gateState() === 'show',
+				build: (st) => {
+					// 1.13+ can re-render a row in place (update()); its info element is kept, so drop an earlier block first.
+					st.infoEl.querySelectorAll('.dw-consent-block').forEach((e) => e.remove());
+					const consent = this.consent = new ConsentState();
+					const { block } = buildConsentBlock(st.infoEl, consent, () => openCheckoutIfConsented(consent, CHECKOUT_URL, (u) => {
+						if (!CHECKOUT_READY) { new Notice('Docxwise Pro is not on sale yet.'); return; }
+						window.open(u);
+					}), (u) => { window.open(u); });
+					return () => block.remove();
+				} },
+		];
 		const keyFirst = !!lic.state.key;
-		if (!keyFirst) buyRows();
-		new Setting(el).setName('This device').setDesc(`Device code ${this.plugin.deviceCode}. In the Polar customer portal this device is listed as "${this.plugin.deviceLabel}".`);
+		if (!keyFirst) rows.push(...buyRows);
+		rows.push({ name: 'This device', desc: `Device code ${this.plugin.deviceCode}. In the Polar customer portal this device is listed as "${this.plugin.deviceLabel}".` });
 		this.keyDraft = lic.state.key;
-		new Setting(el).setName('License key')
-			.setDesc((this.plugin.keyStore.kind === 'keychain' ? 'Kept in Obsidian Keychain, not in your vault. '
+		rows.push({ name: 'License key',
+			desc: (this.plugin.keyStore.kind === 'keychain' ? 'Kept in Obsidian Keychain, not in your vault. '
 				: 'Your Obsidian version has no Keychain, so the key is kept in plain text in this plugin\'s data.json. Update Obsidian to 1.11.4 or later to keep it in Keychain. ')
-				+ 'Sent only to Polar (api.polar.sh), at most once a day.')
-			.addText((t) => { t.inputEl.type = 'password'; t.setPlaceholder('License key').setValue(this.keyDraft).onChange((v) => { this.keyDraft = v.trim(); }); })
-			.addButton((b) => b.setButtonText('Activate').setCta().onClick(async () => { b.setDisabled(true); await lic.activate(this.keyDraft, this.plugin.deviceLabel); this.display(); }))
-			.addButton((b) => b.setButtonText('Remove').onClick(async () => { await lic.clear(); this.display(); }));
-		if (keyFirst) buyRows();
+				+ 'Sent only to Polar (api.polar.sh), at most once a day.',
+			build: (st) => st
+				.addText((t) => { t.inputEl.type = 'password'; t.setPlaceholder('License key').setValue(this.keyDraft).onChange((v) => { this.keyDraft = v.trim(); }); })
+				.addButton((b) => b.setButtonText('Activate').setCta().onClick(async () => { b.setDisabled(true); await lic.activate(this.keyDraft, this.plugin.deviceLabel); this.refresh(); }))
+				.addButton((b) => b.setButtonText('Remove').onClick(async () => { await lic.clear(); this.refresh(); })) });
+		if (keyFirst) rows.push(...buyRows);
+		return rows;
 	}
-	display(): void {
-		const { containerEl: el } = this;
+
+	private sections(): Section[] {
 		const s = this.plugin.settings;
 		const save = () => this.plugin.saveSettings();
+		const general: Row[] = [
+			{ name: 'Output folder', desc: 'Leave empty to save each .docx next to its note. Exports always stay inside your vault; an existing .docx with the same name is replaced.',
+				build: (st) => st.addText((t) => {
+					const set = async (v: string) => { s.outputFolder = v.trim(); await save(); };
+					t.setPlaceholder('Exports').setValue(s.outputFolder).onChange(set);
+					new PathSuggest(this.app, t.inputEl, 'folder', (p) => void set(p));
+				}) },
+			{ name: 'Page size', build: (st) => st.addDropdown((d) => d.addOptions({ A4: 'A4', Letter: 'US Letter' }).setValue(s.page).onChange(async (v) => { s.page = v as Settings['page']; await save(); })) },
+			{ name: 'Note name as title', desc: 'Automatic adds the note name as a title only when the note does not start with a top-level heading.',
+				build: (st) => st.addDropdown((d) => d.addOptions({ auto: 'Automatic', always: 'Always', never: 'Never' }).setValue(s.title).onChange(async (v) => { s.title = v as Settings['title']; await save(); })) },
+			{ name: 'Page numbers', desc: 'Centered in the footer. A Word template\'s own footer replaces it.', build: (st) => st.addToggle((t) => t.setValue(s.pageNumbers).onChange(async (v) => { s.pageNumbers = v; await save(); })) },
+			{ name: 'Open after export', desc: 'Open the .docx in your default app, for example Word, right after saving.', visible: () => Platform.isDesktopApp,
+				build: (st) => st.addToggle((t) => t.setValue(s.openAfter).onChange(async (v) => { s.openAfter = v; await save(); })) },
+		];
+		const citations: Row[] = [
+			{ name: 'Bibliography file', desc: 'A .bib or CSL JSON file in your vault, for example exported from Zotero. A note can override it with a "bibliography" property.',
+				build: (st) => st.addText((t) => {
+					const set = async (v: string) => { s.bibFile = v.trim(); await save(); };
+					t.setPlaceholder('References/library.bib').setValue(s.bibFile).onChange(set);
+					new PathSuggest(this.app, t.inputEl, /\.(bib|json)$/i, (p) => void set(p));
+				}) },
+			{ name: 'Citation style', build: (st) => st.addDropdown((d) => {
+				for (const [k, v] of Object.entries(STYLES)) d.addOption(k, v.label);
+				d.addOption('custom', 'Other (.csl file)…');
+				d.setValue(s.style).onChange(async (v) => { s.style = v; await save(); this.refresh(); });
+			}) },
+			{ name: 'Style file', desc: 'Any CSL style from zotero.org/styles, saved in your vault.', visible: () => s.style === 'custom',
+				build: (st) => st.addText((t) => {
+					const set = async (v: string) => { s.customCsl = v.trim(); await save(); };
+					t.setPlaceholder('References/nature.csl').setValue(s.customCsl).onChange(set);
+					new PathSuggest(this.app, t.inputEl, /\.csl$/i, (p) => void set(p));
+				}) },
+			{ name: 'Reference list heading', desc: 'Leave empty to use the style default.',
+				build: (st) => st.addText((t) => t.setPlaceholder(STYLES[s.style]?.refTitle ?? 'References').setValue(s.refTitle).onChange(async (v) => { s.refTitle = v; await save(); })) },
+		];
+		return [{ rows: general }, { heading: 'Citations', rows: citations }, { heading: 'Pro', rows: this.proRows() }];
+	}
+
+	private static fill(st: Setting, r: Row): void | (() => void) {
+		st.setName(r.name);
+		if (r.desc) st.setDesc(r.desc);
+		// A builder may return a cleanup function (run before 1.13+ tears the row down); anything else is ignored.
+		const cleanup = r.build?.(st);
+		return typeof cleanup === 'function' ? cleanup as () => void : undefined;
+	}
+
+	/** Obsidian 1.13+: declarative settings, also indexed by the settings search. */
+	getSettingDefinitions(): SettingDefinitionItem[] {
+		return this.sections().map((sec): SettingDefinitionGroup => ({
+			type: 'group',
+			heading: sec.heading,
+			items: sec.rows.map((r) => ({ name: r.name, desc: r.desc, visible: r.visible, render: (st: Setting) => DocxwiseSettingTab.fill(st, r) })),
+		}));
+	}
+
+	/** Obsidian 1.5–1.12 only (minAppVersion 1.5.0). 1.13+ renders getSettingDefinitions() and never calls this. */
+	display(): void { this.renderLegacy(); }
+
+	private renderLegacy(): void {
+		const { containerEl: el } = this;
 		el.empty();
-		new Setting(el).setName('Output folder').setDesc('Leave empty to save each .docx next to its note. Exports always stay inside your vault; an existing .docx with the same name is replaced.')
-			.addText((t) => {
-				const set = async (v: string) => { s.outputFolder = v.trim(); await save(); };
-				t.setPlaceholder('Exports').setValue(s.outputFolder).onChange(set);
-				new PathSuggest(this.app, t.inputEl, 'folder', (p) => void set(p));
-			});
-		new Setting(el).setName('Page size').addDropdown((d) => d.addOptions({ A4: 'A4', Letter: 'US Letter' }).setValue(s.page).onChange(async (v) => { s.page = v as Settings['page']; await save(); }));
-		new Setting(el).setName('Note name as title').setDesc('Automatic adds the note name as a title only when the note does not start with a top-level heading.')
-			.addDropdown((d) => d.addOptions({ auto: 'Automatic', always: 'Always', never: 'Never' }).setValue(s.title).onChange(async (v) => { s.title = v as Settings['title']; await save(); }));
-		new Setting(el).setName('Page numbers').setDesc('Centered in the footer. A Word template\'s own footer replaces it.').addToggle((t) => t.setValue(s.pageNumbers).onChange(async (v) => { s.pageNumbers = v; await save(); }));
-		if (Platform.isDesktopApp) new Setting(el).setName('Open after export').setDesc('Open the .docx in your default app, for example Word, right after saving.').addToggle((t) => t.setValue(s.openAfter).onChange(async (v) => { s.openAfter = v; await save(); }));
-
-		new Setting(el).setName('Citations').setHeading();
-		new Setting(el).setName('Bibliography file').setDesc('A .bib or CSL JSON file in your vault, for example exported from Zotero. A note can override it with a "bibliography" property.')
-			.addText((t) => {
-				const set = async (v: string) => { s.bibFile = v.trim(); await save(); };
-				t.setPlaceholder('References/library.bib').setValue(s.bibFile).onChange(set);
-				new PathSuggest(this.app, t.inputEl, /\.(bib|json)$/i, (p) => void set(p));
-			});
-		new Setting(el).setName('Citation style').addDropdown((d) => {
-			for (const [k, v] of Object.entries(STYLES)) d.addOption(k, v.label);
-			d.addOption('custom', 'Other (.csl file)…');
-			d.setValue(s.style).onChange(async (v) => { s.style = v; await save(); this.display(); });
-		});
-		if (s.style === 'custom') new Setting(el).setName('Style file').setDesc('Any CSL style from zotero.org/styles, saved in your vault.')
-			.addText((t) => {
-				const set = async (v: string) => { s.customCsl = v.trim(); await save(); };
-				t.setPlaceholder('References/nature.csl').setValue(s.customCsl).onChange(set);
-				new PathSuggest(this.app, t.inputEl, /\.csl$/i, (p) => void set(p));
-			});
-		new Setting(el).setName('Reference list heading').setDesc('Leave empty to use the style default.')
-			.addText((t) => t.setPlaceholder(STYLES[s.style]?.refTitle ?? 'References').setValue(s.refTitle).onChange(async (v) => { s.refTitle = v; await save(); }));
-
-		this.proSection(el);
+		for (const sec of this.sections()) {
+			if (sec.heading) new Setting(el).setName(sec.heading).setHeading();
+			for (const r of sec.rows) if (!r.visible || r.visible()) DocxwiseSettingTab.fill(new Setting(el), r);
+		}
 	}
 }

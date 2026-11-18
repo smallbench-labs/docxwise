@@ -1,0 +1,12 @@
+Installing .NET 8 SDK into /tmp/dotnet-sdk (temporary; not a system install)...
+OpenXmlValidator  FileFormatVersions.Office2019
+
+FILE	Big.docx	0 error(s)	release-audit/qa-0.1.2-20261118/docx/Big.docx
+FILE	Empty.docx	0 error(s)	release-audit/qa-0.1.2-20261118/docx/Empty.docx
+FILE	Research-APA.docx	0 error(s)	release-audit/qa-0.1.2-20261118/docx/Research-APA.docx
+FILE	Research-ChicagoNotes.docx	0 error(s)	release-audit/qa-0.1.2-20261118/docx/Research-ChicagoNotes.docx
+FILE	Title.docx	0 error(s)	release-audit/qa-0.1.2-20261118/docx/Title.docx
+FILE	Welcome.docx	0 error(s)	release-audit/qa-0.1.2-20261118/docx/Welcome.docx
+
+SUMMARY	files=6	files_with_errors=0	total_errors=0	version=Office2019
+exit 0
