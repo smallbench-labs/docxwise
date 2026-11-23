@@ -17,7 +17,7 @@ const shims = { name: 'shims', setup(b) {
 	b.onResolve({ filter: /^(lie|setimmediate|readable-stream)$/ }, (a) => ({ path: local(`./src/shims/${a.path}.ts`) }));
 } };
 const notices = (await readFile('THIRD_PARTY_NOTICES.md', 'utf8')).replace(/\*\//g, '* /');
-const banner = `/*! Docxwise ${manifest.version} - Copyright (c) 2026 Smallbench Labs (Roger Chang) - MIT License.
+const banner = `/*! Docxwise ${manifest.version} - Copyright (c) 2026 Smallbench Labs - MIT License.
  * This file also contains third-party software under its own licenses (MIT, BSD-2-Clause, BSD-3-Clause, Zlib,
  * CPAL-1.0) and CSL styles under CC BY-SA 3.0. The full notices are at the end of this file.
  * CPAL-1.0: the Source Code version of citeproc-js 2.4.63 (bundled unmodified) is available under the terms of
