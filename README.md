@@ -1,12 +1,12 @@
 # Docxwise
 
-Export Obsidian notes to clean, editable Word (`.docx`) files. No Pandoc, no extra installs; works on desktop and mobile.
-
-![Exporting a note: the notice shows where the .docx was saved](docs/export-notice.png)
-
 ![A page of an exported .docx with equations, citations, callouts and a footnote](docs/sample-output.png)
 
-*Exported page rendered with LibreOffice for this screenshot. Equations are native Word equations; Word's own rendering can differ slightly.*
+*A page exported by Docxwise, rendered with LibreOffice for this screenshot. Equations are native Word equations; Word's own rendering can differ slightly.*
+
+Export Obsidian notes to clean, editable Word (`.docx`) files. No Pandoc, no extra installs; works on desktop and mobile. **Free:** headings, lists with real Word numbering, tables, images, code, callouts, embedded notes, footnotes, native Word equations, citations (APA, Chicago, MLA, IEEE or any `.csl` style), Mermaid diagrams and Dataview results; it works offline. **Pro** (US$19 once, plus tax where applicable; no subscription) adds your own Word template (fonts, heading styles, header and footer, page size and margins) and merging a folder, or a note and everything it links to, into one document.
+
+![Exporting a note: the notice shows where the .docx was saved](docs/export-notice.png)
 
 ## Features
 
